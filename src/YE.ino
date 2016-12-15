@@ -1,13 +1,17 @@
 #include "Arduino.h"
 
-  #include <SPI.h>
-                  // Arduino 5V (VCC)  to TFT: LED, VCC
-                  // Arduino GND to TFT: GND
-                  // Arduino D13 (SCK) to TFT: SCK
-                  // Arduino D11 (MOSI) to TFT:
-  #define cs  10  // Arduino D10 (SS) to TFT: CS
-  #define dc   9  // Arduino D9 to TFT: A0
-  #define rst  8  // Arduino-D8 to TFT: RESET
+#include <PN532.h>
+#include <NfcAdapter.h>
+#include <Wire.h>
+#include <crc16.h>
+#include <M24SR.h>
+/*
+4 VSS (GND)       -> Arduino Gnd
+5 SDA (I2C data)  -> Arduino A4
+6 SCL (I2C clock) -> Arduino A5
+7 GPO             -> Arduino D7 + Pull-Up resistor (>4.7kOhm) to VCC
+8 VCC (2...5V)    -> Arduino 5V
+*/
 
 #define gpo_pin 7 // Arduino pin 7 GPO
 M24SR m24sr(gpo_pin);
@@ -38,12 +42,12 @@ void setup() {
   pinMode(testButton, INPUT);
 
   Serial.begin(9600);
-    //for debug purpose
-    //m24sr._verbose = true;
-    //m24sr._cmds = true;
-    m24sr._setup();
+   //for debug purpose
+   //m24sr._verbose = true;
+   //m24sr._cmds = true;
+   m24sr._setup();
 
-  m24sr.displaySystemFile();
+   m24sr.displaySystemFile();
 }
 
 void loop() {
