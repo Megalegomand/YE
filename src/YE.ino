@@ -1,10 +1,11 @@
 #include "Arduino.h"
 
-#include <PN532.h>
+//#include <PN532.h>
 #include <NfcAdapter.h>
 #include <Wire.h>
-#include <crc16.h>
+#include <Crc16.h>
 #include <M24SR.h>
+#include <avr/pgmspace.h>
 /*
 4 VSS (GND)       -> Arduino Gnd
 5 SDA (I2C data)  -> Arduino A4
@@ -105,9 +106,10 @@ void displayNDefRecord() {
     if (pNDefMsg != NULL) {
        pNDefMsg->print();
        NdefRecord rec = pNDefMsg->getRecord(0);
-       String txt = rec.toString();
-       Serial.print(F("NDefRecord: "));
-       Serial.println(txt);
+       rec.print();
+       //String txt = rec.toString();
+       //Serial.print(F("NDefRecord: "));
+       //Serial.println(txt);
  }
 }
 
