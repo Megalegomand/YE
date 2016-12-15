@@ -1,10 +1,20 @@
 #include "Arduino.h"
 
-// ToDo List
+  #include <SPI.h>
+                  // Arduino 5V (VCC)  to TFT: LED, VCC
+                  // Arduino GND to TFT: GND
+                  // Arduino D13 (SCK) to TFT: SCK
+                  // Arduino D11 (MOSI) to TFT:
+  #define cs  10  // Arduino D10 (SS) to TFT: CS
+  #define dc   9  // Arduino D9 to TFT: A0
+  #define rst  8  // Arduino-D8 to TFT: RESET
 
-int led_lowBat = 7;
-int led_access = 6;
-int led_denied = 5;
+#define gpo_pin 7 // Arduino pin 7 GPO
+M24SR m24sr(gpo_pin);
+
+int led_lowBat = 5;
+int led_access = 4;
+int led_denied = 6;
 int sol = 8;
 
 int testButton = 9;
@@ -26,9 +36,20 @@ void setup() {
   pinMode(led_denied, OUTPUT);
   pinMode(sol, OUTPUT);
   pinMode(testButton, INPUT);
+
+  Serial.begin(9600);
+    //for debug purpose
+    //m24sr._verbose = true;
+    //m24sr._cmds = true;
+    m24sr._setup();
+
+  m24sr.displaySystemFile();
 }
 
 void loop() {
+  if (m24sr.checkGPOTrigger()) {
+        displayNDefRecord();
+  }
   if (cs == STANDBY) {
     cs = checkNFC();
     switch (cs) {
@@ -72,6 +93,18 @@ void loop() {
         break;
     }
   }
+}
+
+void displayNDefRecord() {
+    //read NDef message from memory
+    NdefMessage* pNDefMsg = m24sr.getNdefMessage();
+    if (pNDefMsg != NULL) {
+       pNDefMsg->print();
+       NdefRecord rec = pNDefMsg->getRecord(0);
+       String txt = rec.toString();
+       Serial.print(F("NDefRecord: "));
+       Serial.println(txt);
+ }
 }
 
 NFC checkNFC() {
